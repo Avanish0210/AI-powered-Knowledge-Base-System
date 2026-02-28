@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg18
+    container_name: ChatBot-local
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: chatbot
+      POSTGRES_DB: ChatBot-db
+      TZ: Asia/Kolkata
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/18/main
+    restart: unless-stopped
+
+volumes:
+  pgdata:
