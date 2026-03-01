@@ -180,6 +180,40 @@ This project demonstrates:
 
 ---
 
+## ⚡ Quick Start Summary
+
+```bash
+# 1. Pull AI models
+ollama pull gemma3:1b
+ollama pull nomic-embed-text:latest
+
+# 2. Start database
+docker-compose up -d
+
+# 3. Run backend
+./mvnw spring-boot:run
+
+# 4. Open frontend
+cd frontend && python -m http.server 5500
+# Visit http://localhost:5500
+```
+---
+
+## 🎨 Frontend Features
+
+- ✨ **Premium dark-mode** design with glassmorphism and gradient accents
+- 🎯 **Drag & drop** PDF upload with animated progress bar
+- 💬 **Real-time chat** interface with typing indicators
+- 📱 **Fully responsive** — works on mobile, tablet, and desktop
+- 🎭 **Scroll animations** — elements animate in on scroll
+- 🔖 **Document selector** sidebar shows model info and search parameters
+- 💡 **Example queries** — quick-start buttons for common questions
+
+---
+> [!CAUTION]
+> The order matters! Start services in this sequence: **Ollama → Docker → Backend → Frontend**
+
+
 ## 👨‍💻 Author
 
 **Avanish Pratap Singh**

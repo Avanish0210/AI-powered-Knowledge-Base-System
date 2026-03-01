@@ -1,0 +1,258 @@
+# 🧠 DocBrain — AI-Powered Knowledge Base System
+
+> **Upload PDFs, generate vector embeddings, and chat with your documents using local AI.**
+
+---
+
+## 📸 Frontend Preview
+
+````carousel
+![Hero Section — Landing page with gradient branding, floating cards showing the RAG pipeline flow, and animated orb visual](C:\Users\LENOVO\.gemini\antigravity\brain\293fadec-d46d-4cbe-9d04-287dc117908d\hero_section_1772308322304.png)
+<!-- slide -->
+![Features Section — Six capability cards highlighting PDF Upload, Vector Embeddings, Semantic Search, AI Chat, Privacy, and RAG Pipeline](C:\Users\LENOVO\.gemini\antigravity\brain\293fadec-d46d-4cbe-9d04-287dc117908d\features_section_1772308341093.png)
+<!-- slide -->
+![Chat Interface — Split-pane layout with document selector sidebar (showing model info) and chat area with example query buttons](C:\Users\LENOVO\.gemini\antigravity\brain\293fadec-d46d-4cbe-9d04-287dc117908d\chat_section_1772308387272.png)
+````
+
+---
+
+## 🏗️ Architecture Overview
+
+```mermaid
+graph LR
+    A["🌐 Frontend<br/>HTML/CSS/JS"] -->|"POST /documents/upload"| B["☕ Spring Boot<br/>Backend"]
+    A -->|"GET /documents/chat"| B
+    B -->|"PDF Parsing"| C["📄 IngestionService"]
+    C -->|"Chunking"| D["TokenTextSplitter"]
+    D -->|"Embed via Ollama"| E["🧠 nomic-embed-text"]
+    E -->|"Store vectors"| F["🗄️ PGVector"]
+    A -->|"User query"| G["💬 DocChatController"]
+    G -->|"Similarity search"| F
+    G -->|"Prompt + context"| H["🤖 Gemma 3 via Ollama"]
+    H -->|"AI answer"| A
+```
+
+---
+
+## 📁 Project Structure
+
+```
+Spring_AI Project/
+├── frontend/                    ← NEW: Frontend UI
+│   ├── index.html               # Main HTML page
+│   ├── style.css                # Premium dark-mode design system
+│   └── app.js                   # Upload + Chat logic
+├── src/main/java/com/example/ChatBot/
+│   ├── ChatBotApplication.java  # Spring Boot entry point
+│   ├── Config/
+│   │   ├── AIConfig.java        # ChatClient bean config
+│   │   └── WebConfig.java       # NEW: CORS config for frontend
+│   ├── DocChatController.java   # REST API (upload + chat)
+│   └── IngestionService.java    # PDF → chunks → PGVector
+├── src/main/resources/
+│   └── application.yaml         # Ollama, PGVector, DB config
+├── docker-compose.yml           # PostgreSQL + PGVector
+└── pom.xml                      # Spring Boot 4.0.3 + Spring AI 2.0.0-M2
+```
+
+---
+
+## 🔧 Tech Stack
+
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Backend** | Spring Boot 4.0.3 | REST API framework |
+| **AI Framework** | Spring AI 2.0.0-M2 | RAG pipeline, vector store integration |
+| **Chat Model** | Gemma 3 (1B) via Ollama | Natural language Q&A |
+| **Embeddings** | nomic-embed-text via Ollama | Semantic vector generation |
+| **Vector DB** | PGVector (PostgreSQL) | Similarity search over embeddings |
+| **PDF Parsing** | spring-ai-pdf-document-reader | Extract text from PDFs |
+| **Frontend** | Vanilla HTML/CSS/JS | Premium dark-mode chat UI |
+
+---
+
+## 🚀 How to Run — Step by Step
+
+### Prerequisites
+
+> [!IMPORTANT]
+> You need these installed before starting:
+> - **Java 21** (JDK)
+> - **Maven** (or use the included [mvnw](file:///c:/Users/LENOVO/OneDrive/Documents/Projects/Spring_AI%20Project/mvnw) wrapper)
+> - **Docker** (for PostgreSQL + PGVector)
+> - **Ollama** (for local AI models)
+
+---
+
+### Step 1: Install & Start Ollama
+
+Download Ollama from [ollama.com](https://ollama.com) and install it.
+
+Then pull the required models:
+
+```bash
+# Pull the chat model (Gemma 3, 1B parameter version)
+ollama pull gemma3:1b
+
+# Pull the embedding model
+ollama pull nomic-embed-text:latest
+```
+
+Verify Ollama is running:
+```bash
+ollama list
+```
+
+You should see both `gemma3:1b` and `nomic-embed-text:latest` listed.
+
+> [!NOTE]
+> Ollama runs on `http://localhost:11434` by default. The app is already configured to connect there.
+
+---
+
+### Step 2: Start PostgreSQL with PGVector (Docker)
+
+From the project root directory:
+
+```bash
+docker-compose up -d
+```
+
+This starts a PostgreSQL 18 instance with PGVector extension on **port 5433**.
+
+Verify it's running:
+```bash
+docker ps
+```
+
+You should see a container named `ChatBot-local`.
+
+> [!TIP]
+> Database credentials (already configured in [application.yaml](file:///c:/Users/LENOVO/OneDrive/Documents/Projects/Spring_AI%20Project/src/main/resources/application.yaml)):
+> - **URL**: `jdbc:postgresql://localhost:5433/ChatBot-db`
+> - **User**: `user`
+> - **Password**: `chatbot`
+
+---
+
+### Step 3: Build & Run the Spring Boot Backend
+
+```bash
+# Using Maven wrapper (recommended)
+./mvnw spring-boot:run
+
+# OR using system Maven
+mvn spring-boot:run
+```
+
+Wait until you see:
+```
+Started ChatBotApplication in X.XX seconds
+```
+
+The backend API will be available at **http://localhost:8080**
+
+> [!WARNING]
+> Make sure Ollama and PostgreSQL are running BEFORE starting the backend, otherwise the app will fail to connect.
+
+---
+
+### Step 4: Open the Frontend
+
+Simply open the frontend in your browser:
+
+```bash
+# Option A: Double-click the file
+# Open: frontend/index.html in your browser
+
+# Option B: Use a local server (recommended for best experience)
+cd frontend
+python -m http.server 5500
+# Then open http://localhost:5500
+```
+
+> [!TIP]
+> Using a local HTTP server avoids potential CORS issues with `file://` protocol.
+
+---
+
+### Step 5: Upload a PDF & Start Chatting!
+
+1. **Scroll down** to the **Upload** section
+2. **Drag & drop** a PDF file (or click to browse)
+3. Wait for the upload and embedding process to complete ✅
+4. **Scroll down** to the **Chat** section
+5. **Select your document** from the sidebar
+6. **Type a question** and press Enter!
+
+---
+
+## 🔌 API Endpoints
+
+| Method | Endpoint | Parameters | Description |
+|--------|----------|-----------|-------------|
+| `POST` | `/documents/upload` | `file` (multipart) | Upload a PDF for processing |
+| `GET` | `/documents/chat` | `query`, `docName` | Ask a question about a document |
+
+### Example API Calls
+
+```bash
+# Upload a PDF
+curl -X POST http://localhost:8080/documents/upload \
+  -F "file=@my-document.pdf"
+
+# Chat with the uploaded document
+curl "http://localhost:8080/documents/chat?query=What%20is%20the%20main%20topic&docName=my-document.pdf"
+```
+
+---
+
+## 🧩 Key Backend Components
+
+### [DocChatController.java](file:///c:/Users/LENOVO/OneDrive/Documents/Projects/Spring_AI%20Project/src/main/java/com/example/ChatBot/DocChatController.java)
+- **Upload endpoint**: Receives PDF, delegates to [IngestionService](file:///c:/Users/LENOVO/OneDrive/Documents/Projects/Spring_AI%20Project/src/main/java/com/example/ChatBot/IngestionService.java#18-48)
+- **Chat endpoint**: Uses `QuestionAnswerAdvisor` with vector store similarity search (top-4 chunks, 0.7 threshold), filtered by document name
+
+### [IngestionService.java](file:///c:/Users/LENOVO/OneDrive/Documents/Projects/Spring_AI%20Project/src/main/java/com/example/ChatBot/IngestionService.java)
+- Reads PDF page-by-page using `PagePdfDocumentReader`
+- Splits text into 800-token chunks via `TokenTextSplitter`
+- Adds `source` metadata (filename) to each chunk
+- Stores embeddings in PGVector
+
+### [WebConfig.java](file:///c:/Users/LENOVO/OneDrive/Documents/Projects/Spring_AI%20Project/src/main/java/com/example/ChatBot/Config/WebConfig.java) *(NEW)*
+- Enables CORS for all origins so the frontend can call the backend API
+
+---
+
+## 🎨 Frontend Features
+
+- ✨ **Premium dark-mode** design with glassmorphism and gradient accents
+- 🎯 **Drag & drop** PDF upload with animated progress bar
+- 💬 **Real-time chat** interface with typing indicators
+- 📱 **Fully responsive** — works on mobile, tablet, and desktop
+- 🎭 **Scroll animations** — elements animate in on scroll
+- 🔖 **Document selector** sidebar shows model info and search parameters
+- 💡 **Example queries** — quick-start buttons for common questions
+
+---
+
+## ⚡ Quick Start Summary
+
+```bash
+# 1. Pull AI models
+ollama pull gemma3:1b
+ollama pull nomic-embed-text:latest
+
+# 2. Start database
+docker-compose up -d
+
+# 3. Run backend
+./mvnw spring-boot:run
+
+# 4. Open frontend
+cd frontend && python -m http.server 5500
+# Visit http://localhost:5500
+```
+
+> [!CAUTION]
+> The order matters! Start services in this sequence: **Ollama → Docker → Backend → Frontend**
