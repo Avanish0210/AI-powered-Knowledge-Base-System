@@ -19,6 +19,7 @@ public class DocChatController {
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
     private final IngestionService ingestionService;
+    private final AITools aiTools;
 
     @PostMapping("/upload")
     public String upload(@RequestParam("file") MultipartFile file) throws IOException {
@@ -30,6 +31,7 @@ public class DocChatController {
     @GetMapping("/chat")
     public String chat(@RequestParam String query , @RequestParam String docName){
         return chatClient.prompt()
+                .tools(aiTools)
                 .advisors(
                         QuestionAnswerAdvisor.builder(vectorStore)
                                 .searchRequest(SearchRequest.builder()
