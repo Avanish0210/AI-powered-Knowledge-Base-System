@@ -1,36 +1,6 @@
 spring:
-  application:
-    name: ChatBot
-  ai:
-    ollama:
-      base-url: http://localhost:11434
-      chat:
-        options:
-          model: gemma3:1b
-      embedding:
-        options:
-          model: nomic-embed-text:latest
-    vectorstore:
-      pgvector:
-        initialize-schema: true
+  profiles:
+    active: ${SPRING_PROFILE:local}
 
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-
-    jpa:
-      hibernate:
-        ddl-auto: update
-      show-sql: true
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
-          format_sql: true
-
-
-logging:
-  level:
-    org.springframework.ai:
-      chat.client: DEBUG
+  server:
+    port: ${PORT:8080}

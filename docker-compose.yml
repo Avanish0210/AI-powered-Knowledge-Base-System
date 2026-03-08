@@ -2,7 +2,7 @@ services:
 
   postgres:
     image: pgvector/pgvector:pg18
-    container_name: chatbot-postgres
+    container_name: Chatbot-postgres
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: chatbot
@@ -14,6 +14,7 @@ services:
     restart: unless-stopped
 
   chatbot:
+    build: .
     image: chatbot.application:latest
     container_name: chatbot-app
     depends_on:
@@ -21,6 +22,7 @@ services:
     ports:
       - "8001:8080"
     environment:
+      SPRING_PROFILE: development
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ChatBot-db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: chatbot
