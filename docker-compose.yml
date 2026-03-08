@@ -1,16 +1,30 @@
 services:
+
   postgres:
     image: pgvector/pgvector:pg18
-    container_name: ChatBot-local
+    container_name: chatbot-postgres
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: chatbot
       POSTGRES_DB: ChatBot-db
-      TZ: Asia/Kolkata
     ports:
       - "5433:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/18/main
+      - pgdata:/var/lib/postgresql
+    restart: unless-stopped
+
+  chatbot:
+    image: chatbot.application:latest
+    container_name: chatbot-app
+    depends_on:
+      - postgres
+    ports:
+      - "8001:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ChatBot-db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: chatbot
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
     restart: unless-stopped
 
 volumes:
