@@ -1,5 +1,5 @@
 // ===== CONFIGURATION =====
-const API_BASE = 'https://chatbot-application-final-latest-1.onrender.com';
+const API_BASE = '${BACKEND-URL}';
 
 // ===== STATE =====
 const state = {
