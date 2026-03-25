@@ -7,6 +7,7 @@ import org.springframework.ai.chat.client.ResponseEntity;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +30,7 @@ public class DocChatController {
 
 
     @GetMapping("/chat")
+    @Cacheable(cacheNames = "Data" , key = "#query")
     public String chat(@RequestParam String query , @RequestParam String docName){
         return chatClient.prompt()
                 .tools(aiTools)
